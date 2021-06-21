@@ -17,7 +17,7 @@ def tests(session):
 
 
 @nox.session(reuse_venv=True, python="3.8")
-def cop(session):
+def lint(session):
     """Run all pre-commit hooks."""
     session.install("poetry")
     session.run("poetry", "install")
