@@ -28,5 +28,7 @@ jobs:
           uses: actions/setup-python@v2
           with:
             python-version: 3.8 #install the python needed
-        - name: execute nox script # run the run.py to get the latest data
+        - name: Setup Nox
+          uses: excitedleigh/setup-nox@38c698655f40d5fe659b8589764ed04ee36d0414
+        - name: execute nox script
           run: python noxfile.py
