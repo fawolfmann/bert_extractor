@@ -1,0 +1,1 @@
+"""Bert Data Extractor"""

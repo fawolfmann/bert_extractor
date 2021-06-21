@@ -6,8 +6,20 @@ authors = ["fawolfmann <fawolfmann@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+pandas = "1.2.3"
 
 [tool.poetry.dev-dependencies]
+pre-commit = "2.2.0"
+isort = "5.8.0"
+mypy = "0.770"
+flake8 = "3.7.8"
+pytest = "6.2.3"
+pytest-cov = "2.11.1"
+pytest-xdist = "2.2.1"
+pylint = "2.7.4"
+pdbpp = "0.10.2"
+black = "19.10b0"
+nox = "2020.12.31"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
