@@ -29,3 +29,4 @@ repos:
         language: system
         types: [python]
         stages: [commit]
+        exclude: ^tests/
