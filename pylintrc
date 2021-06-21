@@ -1,0 +1,34 @@
+[FORMAT]
+# Good variable names which should always be accepted, separated by a comma
+good-names=i,j,k,_,pk,x,y,f,logger,config,df,s3
+max-line-length = 88  # as in black
+
+[MISCELLANEOUS]
+
+# List of note tags to take in consideration, separated by a comma.
+notes=FIXME,XXX,TODO
+
+[MESSAGES CONTROL]
+
+disable =
+    # Disable conventions and refactors warnings
+    C,
+    R,
+    # Errors
+    import-error,
+    no-name-in-module,
+    # Warnings:
+    dangerous-default-value,
+    lost-exception,
+    using-constant-test,
+    fixme, # no clue why notes does not fix it
+    # They see me disablin', they hatin'
+    arguments-differ,
+    no-value-for-parameter,
+    exec-used,
+    unused-argument,
+    signature-differs,
+    no-value-for-parameter,
+    protected-access,
+    logging-format-interpolation
+    logging-fstring-interpolation

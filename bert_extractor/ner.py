@@ -1,0 +1,1 @@
+"""NER Data Extractor"""
