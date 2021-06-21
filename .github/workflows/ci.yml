@@ -30,7 +30,7 @@ jobs:
             python-version: 3.8 #install the python needed
         - name: Setup Nox
           uses: excitedleigh/setup-nox@38c698655f40d5fe659b8589764ed04ee36d0414
-        - name: execute cop with nox
-          run: nox --sessions cop
+        - name: execute lint with nox
+          run: nox --sessions lint
         - name: execute tests with nox
           run: nox --sessions tests
