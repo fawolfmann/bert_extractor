@@ -1,0 +1,31 @@
+repos:
+  - repo: local
+    hooks:
+      - id: isort
+        name: isort
+        entry: poetry run isort
+        language: system
+        types: [python]
+        stages: [commit]
+
+      - id: black
+        name: black
+        entry: poetry run black
+        language: system
+        types: [python]
+        stages: [commit]
+
+      - id: mypy
+        name: mypy
+        entry: poetry run mypy
+        language: system
+        types: [python]
+        stages: [commit]
+        exclude: ^tests/
+
+      - id: pylint
+        name: pylint
+        entry: poetry run pylint
+        language: system
+        types: [python]
+        stages: [commit]
