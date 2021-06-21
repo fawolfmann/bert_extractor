@@ -68,3 +68,9 @@ For this module I used this tools to lint code with coding good practice.
 - pre-commit.
 
 As the tests linting runs on Github Actions.
+
+## Productionable
+### pin version
+### poetry to prod
+#### to pip
+#### to docker
