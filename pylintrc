@@ -30,5 +30,5 @@ disable =
     signature-differs,
     no-value-for-parameter,
     protected-access,
-    logging-format-interpolation
+    logging-format-interpolation,
     logging-fstring-interpolation
