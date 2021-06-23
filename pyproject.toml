@@ -8,6 +8,7 @@ authors = ["fawolfmann <fawolfmann@gmail.com>"]
 python = "^3.8"
 pandas = "^1.2.3"
 transformers = "^4.7.0"
+scikit-learn = "^0.24"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "2.2.0"
