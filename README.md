@@ -63,7 +63,6 @@ This repo has a Github action that execute the tests in the [tests](./tests) fol
 For this module I used this tools to lint code with coding good practice.
 - black.
 - isort.
-- mypy.
 - pylint.
 - pre-commit.
 
