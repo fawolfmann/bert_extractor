@@ -1,5 +1,3 @@
-#  type: ignore
-
 """Reviews Data Extractor"""
 
 from gzip import decompress
@@ -8,7 +6,7 @@ import json
 import pandas as pd
 import requests
 
-from bert_extractor.base import BaseBERTExtractor
+from bert_extractor.extractors.base import BaseBERTExtractor
 
 
 class ReviewsExtractor(BaseBERTExtractor):
