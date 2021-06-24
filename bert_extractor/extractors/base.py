@@ -1,11 +1,15 @@
 """Extractor base class"""
 from abc import ABC
 import logging
+import os
 from pathlib import Path
 import pickle
-from typing import Any, Union
+from typing import Any, Tuple, Union
 
+import numpy as np
 import pandas as pd  # type: ignore
+from sklearn.model_selection import train_test_split
+from transformers import BertTokenizer
 
 logger = logging.getLogger(__name__)
 
@@ -13,15 +17,29 @@ COMPRESSION = "gzip"
 
 
 class BaseBERTExtractor(ABC):
-    def __init__(self):
+    def __init__(
+        self,
+        cache_filepath: Path,
+        pretrained_model_name_or_path: Union[str, os.PathLike],
+        sentence_col: str,
+        labels_col: str,
+    ):
         """Base class to extract bert classification data from any datasource."""
-        self.cache_filepath: Path = None
+        self.cache_filepath = cache_filepath
+        self.pretrained_model_name_or_path = pretrained_model_name_or_path
+        self.sentence_col = sentence_col
+        self.labels_col = labels_col
 
-    def extract_preprocess(self, url: str) -> pd.DataFrame:
+    def extract_preprocess(
+        self, url: str
+    ) -> Tuple[
+        np.array, np.array, np.array, np.array, np.array, np.array,
+    ]:
         """Extract and preprocess data, for BERT tasks.
         The pipelines is:
             - extract_raw (here we read it from or set the cache)
             - preprocess
+            - bert_tokenizer
             - validate
         
         Parameters
@@ -31,14 +49,14 @@ class BaseBERTExtractor(ABC):
         
         Returns
         -------
-        pd.DataFrame
+        Tuple[np.array]
             Extracted and preprocessed data to consume BERT model.
         """
         raw_df = self.extract_raw(url)
         df = self.preprocess(raw_df)
         self.validate_df(df)
 
-        return df
+        return self.bert_tokenizer(df)
 
     def extract_raw(self, url: str) -> pd.DataFrame:
         """Extract raw data from a url.
@@ -70,6 +88,71 @@ class BaseBERTExtractor(ABC):
             Preprocessed df of shape ...
         """
         return pd.DataFrame()
+
+    def bert_tokenizer(
+        self, df: pd.DataFrame
+    ) -> Tuple[
+        np.array, np.array, np.array, np.array, np.array, np.array,
+    ]:
+        """[summary]
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            [description]
+        sentence_col: str
+            [description]
+        labels_col: str
+            [description]
+
+        Returns
+        -------
+        Tuple[
+            train_inputs : ,
+            validation_inputs : ,
+            train_labels : ,
+            validation_labels : ,
+            train_mask: ,
+            validation_masks : ,
+        ]
+        """
+        tokenizer = BertTokenizer.from_pretrained(
+            self.pretrained_model_name_or_path, do_lower_case=True
+        )
+
+        sentences = df[self.sentence_col].values
+        labels = df[self.labels_col].values
+
+        input_ids = []
+        attention_masks = []
+        # TODO define max_length depending the input.
+
+        for sent in sentences:
+            # `encode_plus` will:
+            #   (1) Tokenize the sentence.
+            #   (2) Prepend the `[CLS]` token to the start.
+            #   (3) Append the `[SEP]` token to the end.
+            #   (4) Map tokens to their IDs.
+            #   (5) Pad or truncate the sentence to `max_length`
+            #   (6) Create attention masks for [PAD] tokens.
+            encoded_dict = tokenizer.encode_plus(
+                sent,  # Sentence to encode.
+                add_special_tokens=True,  # Add '[CLS]' and '[SEP]'
+                max_length=512,  # Pad & truncate all sentences.
+                padding="max_length",
+                return_attention_mask=True,  # Construct attn. masks.
+                return_tensors="np",  # Return numpy tensors.
+            )
+
+            # Add the encoded sentence to the list.
+            input_ids.append(encoded_dict["input_ids"])
+
+            # And its attention mask (simply differentiates padding from non-padding).
+            attention_masks.append(encoded_dict["attention_mask"])
+
+        return train_test_split(
+            input_ids, labels, attention_masks, random_state=2020, test_size=0.2
+        )
 
     def validate_df(self, df: pd.DataFrame):
         """Validate that the data satisfy defined criteria.
