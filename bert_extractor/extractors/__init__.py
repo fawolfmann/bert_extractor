@@ -1,4 +1,4 @@
-"""Bert Data Extractor"""
+"""Bert Extractors"""
 
 from bert_extractor.extractors.base import BaseBERTExtractor
 from bert_extractor.extractors.ner import NERExtractor

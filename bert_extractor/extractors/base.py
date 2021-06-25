@@ -149,7 +149,7 @@ class BaseBERTExtractor(ABC):
 
             # And its attention mask (simply differentiates padding from non-padding).
             attention_masks.append(encoded_dict["attention_mask"])
-
+        # implement NamedTuple
         return train_test_split(
             input_ids, labels, attention_masks, random_state=2020, test_size=0.2
         )
