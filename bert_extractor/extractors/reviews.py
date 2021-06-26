@@ -2,11 +2,14 @@
 
 from gzip import decompress
 import json
+import logging
 
 import pandas as pd
 import requests
 
 from bert_extractor.extractors.base import BaseBERTExtractor
+
+logger = logging.getLogger(__name__)
 
 
 class ReviewsExtractor(BaseBERTExtractor):
@@ -30,7 +33,9 @@ class ReviewsExtractor(BaseBERTExtractor):
         pd.DataFrame
             df with all the data extracted.
         """
-        return pd.DataFrame(
+        logger.info("Going to get data from %s", url)
+
+        df = pd.DataFrame(
             json.loads(
                 "["
                 + decompress(requests.get(url).content)
@@ -39,24 +44,27 @@ class ReviewsExtractor(BaseBERTExtractor):
                 + "]"
             )
         )
+        logger.info("Extraction successfull")
+        return df
 
     def preprocess(self, df: pd.DataFrame) -> pd.DataFrame:
-        """[summary]
+        """Create the columns with the sentences and labels.
 
         Parameters
         ----------
         df : pd.DataFrame
-            [description]
+            extracted raw data.
 
         Returns
         -------
         pd.DataFrame
-            [description]
+            processed df.
         """
-        df["sentence"] = df["summary"] + " : " + df["reviewText"]
+        df[self.sentence_col] = df["summary"] + " : " + df["reviewText"]
         # REVIEW THIS LINE, see if we can remove it and it dont break the dropna()
         df = df[["overall", "sentence"]]
         df.dropna(inplace=True)
-        df["overall"] = df["overall"].astype(int)
+        df[self.labels_col] = df["overall"].astype(int)
+        logger.info("Preproccessed dataframe")
 
         return df
