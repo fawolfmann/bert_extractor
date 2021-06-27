@@ -1,4 +1,4 @@
-"""Data Extractor tests"""
+"""BaseBERTExtractor tests"""
 
 import pytest
 
