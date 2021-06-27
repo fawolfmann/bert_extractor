@@ -1,5 +1,6 @@
 # BERT data Extractor
-Python module to extract and preprocess data for BERT Classification
+Python module to extract and preprocess data for BERT Classification.
+BERT have specific format requires...
 
 ## Install
 To install i used [Poetry](https://python-poetry.org/docs/) as environment and dependencies solving tool.
