@@ -141,7 +141,8 @@ class BaseBERTExtractor(ABC):
 
         sentences = df[self.sentence_col].values
         labels = df[self.labels_col].values
-        max_length = min(max(len(sent) for sent in sentences), 512)
+
+        max_length = min(max(len(tokenizer.encode(sent)) for sent in sentences), 512)
         logger.info("Max sentences length %s", max_length)
 
         for sent in sentences:
@@ -159,7 +160,7 @@ class BaseBERTExtractor(ABC):
         logger.info("Tokenized %s sentence", len(sentences))
 
         return TokenizedTensor(
-            train_test_split(
+            *train_test_split(
                 input_ids,
                 labels,
                 attention_masks,
