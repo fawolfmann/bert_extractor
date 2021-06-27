@@ -59,6 +59,9 @@ $ poetry run main.py --option=[NER|reviews] --output=default.csv
 ## Testing
 This repo has a Github action that execute the tests in the [tests](./tests) folder, it run with [nox](https://nox.thea.codes/en/stable/).
 
+For testing i use pytests, pytests sit on top of unitests and add some capabilities like ...
+for mocking requests i use [responses](https://github.com/getsentry/responses) package.
+
 ## Development
 For this module I used this tools to lint code with coding good practice.
 - black.
