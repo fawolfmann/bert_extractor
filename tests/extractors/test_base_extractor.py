@@ -3,32 +3,10 @@
 import re
 
 import numpy as np
-import pandas as pd
 import pytest
 
 from bert_extractor.extractors.base import BaseBERTExtractor
-
-
-@pytest.fixture
-def extractor_configs():
-    return {
-        "pretrained_model_name_or_path": "bert-base-uncased",
-        "sentence_col": "text",
-        "labels_col": "label",
-    }
-
-
-@pytest.fixture
-def sample_preprocessed():
-    return pd.DataFrame(
-        {
-            "label": {0: 5, 1: 5},
-            "text": {
-                0: "Five Stars : As advertised. Reasonably priced",
-                1: "Good for the face : Like the oder and the feel when I put it on my face.  I have tried other brands but the reviews from people I know they prefer the oder of this brand. Not hard on the face when dry.  Does not leave dry skin.",
-            },
-        }
-    )
+from tests.extractors.sample_data import extractor_configs, sample_preprocessed
 
 
 def test_bert_tokenizer_output(
