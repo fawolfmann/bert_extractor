@@ -56,7 +56,7 @@ def sample_preprocessed():
 
 
 def test_raw_extraction_request(
-    extractor_configs, sample_df
+    extractor_configs,
 ):  # pylint: disable=redefined-outer-name
     with patch("requests.get") as requests:
         url = ""
@@ -97,6 +97,7 @@ def test_preprocess(
 ):  # pylint: disable=redefined-outer-name
     reviews_extractor = ReviewsExtractor(**extractor_configs)
     preprocessed_df = reviews_extractor.preprocess(sample_df)
+
     assert set(preprocessed_df.columns) == set(
         [extractor_configs["sentence_col"], extractor_configs["labels_col"]]
     )
