@@ -62,9 +62,9 @@ class ReviewsExtractor(BaseBERTExtractor):
         """
         df[self.sentence_col] = df["summary"] + " : " + df["reviewText"]
         # REVIEW THIS LINE, see if we can remove it and it dont break the dropna()
-        df = df[["overall", "sentence"]]
-        df.dropna(inplace=True)
         df[self.labels_col] = df["overall"].astype(int)
+        df = df[[self.labels_col, self.sentence_col]]
+        df.dropna(inplace=True)
         logger.info("Preproccessed dataframe")
 
         return df

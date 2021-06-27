@@ -121,7 +121,6 @@ class BaseBERTExtractor(ABC):
         df : pd.DataFrame
             DataFrame with the processed data to tokenize.
 
-
         Returns
         -------
             TokenizedTensor tuple of numpy array.
