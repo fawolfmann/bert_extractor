@@ -1,6 +1,6 @@
 """Reviews Data Extractor tests"""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pandas as pd
 from pandas.testing import assert_frame_equal
@@ -55,7 +55,7 @@ def sample_preprocessed():
     )
 
 
-def test_raw_extraction_full(
+def test_raw_extraction_request(
     extractor_configs, sample_df
 ):  # pylint: disable=redefined-outer-name
     with patch("requests.get") as requests:
@@ -81,8 +81,10 @@ def test_raw_extraction_response(
 def test_raw_extraction_decompress(
     extractor_configs, sample_df
 ):  # pylint: disable=redefined-outer-name
-    with patch("gzip.decompress") as decompress, patch("requests.get") as response:
-        response.return_value.content = ""
+    with patch("bert_extractor.extractors.reviews.decompress") as decompress, patch(
+        "requests.get"
+    ) as response:
+        response.return_value.content = b""
         decompress.return_value = b'{"overall": 5.0, "verified": true, "reviewTime": "09 1, 2016", "reviewerID": "A3CIUOJXQ5VDQ2", "asin": "B0000530HU", "style": {"Size:": " 7.0 oz", "Flavor:": " Classic Ice Blue"}, "reviewerName": "Shelly F", "reviewText": "As advertised. Reasonably priced", "summary": "Five Stars", "unixReviewTime": 1472688000}\n{"overall": 5.0, "verified": true, "reviewTime": "11 14, 2013", "reviewerID": "A3H7T87S984REU", "asin": "B0000530HU", "style": {"Size:": " 7.0 oz", "Flavor:": " Classic Ice Blue"}, "reviewerName": "houserules18", "reviewText": "Like the oder and the feel when I put it on my face.  I have tried other brands but the reviews from people I know they prefer the oder of this brand. Not hard on the face when dry.  Does not leave dry skin.", "summary": "Good for the face", "unixReviewTime": 1384387200}'
         reviews_extractor = ReviewsExtractor(**extractor_configs)
         df = reviews_extractor.extract_raw("")
