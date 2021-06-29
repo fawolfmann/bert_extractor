@@ -56,6 +56,10 @@ class BaseBERTExtractor(ABC):
         self.labels_col = labels_col
         self.test_size = split_test_size
 
+    def authenticate(self):
+        """Authenticate to a services if needed
+        """
+
     def extract_preprocess(self, url: str) -> TokenizedTensor:
         """Extract and preprocess data, for BERT tasks.
         The pipelines is:
@@ -74,6 +78,7 @@ class BaseBERTExtractor(ABC):
         TokenizedTensor
             Extracted and preprocessed data to consume BERT model.
         """
+        self.authenticate()
         raw_df = self.extract_raw(url)
         df = self.preprocess(raw_df)
         self.validate_df(df)
