@@ -57,6 +57,13 @@ For running purpose i created a main.py file that instantiate the extractors and
 $ poetry run main.py --option=[NER|reviews] --output=default.csv
 ```
 
+#### NER Dataset
+The NER dataset its from Kaggle so i use Kaggle's API to download the dataset. 
+To use it you have to set the [credentials](https://www.kaggle.com/docs/api#authentication) in the configuration file. Also we have a downloaded Dataset on data folder. #TODO add link to data folder.
+
+#### Amazon Reviews Dataset
+This dataset is public but you have to require access in a google form. In the web page there is a light dataset to use as development tool, also i download one dataset so you can try it.
+
 ## Testing
 This repo has a Github action that execute the tests in the [tests](./tests) folder, it run with [nox](https://nox.thea.codes/en/stable/).
 
