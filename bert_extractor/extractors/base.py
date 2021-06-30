@@ -56,7 +56,7 @@ class BaseBERTExtractor(ABC):
         self.labels_col = labels_col
         self.test_size = split_test_size
 
-    def authenticate(self):
+    def authenticate(self, username: str, key: str):
         """Authenticate to a services if needed
         """
 
