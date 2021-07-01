@@ -2,7 +2,7 @@
 from abc import ABC
 import logging
 import os
-from typing import NamedTuple, Union
+from typing import NamedTuple, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -32,8 +32,11 @@ class BaseBERTExtractor(ABC):
         pretrained_model_name_or_path: Union[str, os.PathLike],
         sentence_col: str,
         labels_col: str,
+        auth_username: Optional[str],
+        auth_key: Optional[str],
         split_test_size: float = 0.1,
         cache_path: Union[str, os.PathLike] = "/tmp/bert_extractor",
+        read_cache: bool = False,
     ):
         """Base class to extract bert classification data from any datasource.
 
@@ -45,20 +48,28 @@ class BaseBERTExtractor(ABC):
             name of the column of from where it will be the text.
         labels_col : str
             name of the column of from where it will be the label.
+        auth_username : Optional, str
+            username to configure authentication.
+        auth_key: Optional, str
+            private key to configure authentication.
         split_test_size : float
             amount of dataset to use for test, between [0,1].
         cache_path : Union[str, os.PathLike]
             path to store cached raw data.
+        read_cache : bool
+            True to read from cache_path
         """
-        self.cache_path = cache_path
         self.pretrained_model_name_or_path = pretrained_model_name_or_path
         self.sentence_col = sentence_col
         self.labels_col = labels_col
         self.test_size = split_test_size
+        self.auth_username = auth_username
+        self.auth_key = auth_key
+        self.cache_path = cache_path
+        self.read_cache = read_cache
 
-    def authenticate(self, username: str, key: str):
-        """Authenticate to a services if needed
-        """
+    def authenticate(self):
+        """Authenticate to a services if needed"""
 
     def extract_preprocess(self, url: str) -> TokenizedTensor:
         """Extract and preprocess data, for BERT tasks.
