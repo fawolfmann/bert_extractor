@@ -58,7 +58,7 @@ $ poetry run main.py --option=[NER|reviews] --output=default.csv
 ```
 
 #### NER Dataset
-The NER dataset its from Kaggle so i use Kaggle's API to download the dataset. 
+The NER dataset its from Kaggle so i use Kaggle's API to download the dataset. But to pass the credentials at runtime I fork the [repo](https://github.com/fawolfmann/kaggle-api) so it dont authenticate when you import the package.
 To use it you have to set the [credentials](https://www.kaggle.com/docs/api#authentication) in the configuration file. Also we have a downloaded Dataset on data folder. #TODO add link to data folder.
 
 #### Amazon Reviews Dataset

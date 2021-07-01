@@ -22,9 +22,9 @@ class NERExtractor(BaseBERTExtractor):
         labels_col: str,
         auth_username: Optional[str],
         auth_key: Optional[str],
-        split_test_size: float,
-        cache_path: Union[str, os.PathLike],
-        read_cache: bool,
+        split_test_size: float = 0.1,
+        cache_path: Union[str, os.PathLike] = "/tmp/bert_extractor",
+        read_cache: bool = False,
     ):
         """[summary]
 
@@ -107,6 +107,7 @@ class NERExtractor(BaseBERTExtractor):
             dfs.append(df)
         shutil.rmtree(download_file)
         full_extracted_df = pd.concat(dfs)
+        full_extracted_df.reset_index(drop=True, inplace=True)
 
         logger.info("Extraction successfull")
         return full_extracted_df
@@ -130,13 +131,16 @@ class NERExtractor(BaseBERTExtractor):
         """
         df = df[df.text != "-DOCSTART-"]
         separetor = "|||"
-        df[self.sentence_col] = df.text.str.cat(sep=" ", na_rep=separetor).split(
+        df_out = pd.DataFrame()
+        df_out[self.sentence_col] = df.text.str.cat(sep=" ", na_rep=separetor).split(
             separetor
         )
-        df["tag"] = df["tag"].map(NER_LABLES_MAP)
-        df[self.labels_col] = df.tag.str.cat(sep=" ", na_rep=separetor).split(separetor)
-        df = df[[self.labels_col, self.sentence_col]]
-        df.dropna(inplace=True)
+        df_out[self.labels_col] = df.tag.str.cat(sep=" ", na_rep=separetor).split(
+            separetor
+        )
+        # iterate over every row map and return a list.
+        df["tag"] = df_out[self.labels_col].map(NER_LABLES_MAP)
+        df_out.dropna(inplace=True)
         logger.info("Preproccessed dataframe")
 
-        return df
+        return df_out
