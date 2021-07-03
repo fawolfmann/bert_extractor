@@ -8,11 +8,13 @@ from typing import Dict, List, Tuple
 import requests
 
 from bert_extractor.extractors.base import BaseBERTExtractor
+from bert_extractor.utils import cache_extract_raw
 
 logger = logging.getLogger(__name__)
 
 
 class ReviewsExtractor(BaseBERTExtractor):
+    @cache_extract_raw()
     def extract_raw(self, url: str) -> Dict:
         """Download the url for Amazon reviews cast to a dict.
 

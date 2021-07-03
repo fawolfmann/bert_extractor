@@ -17,7 +17,7 @@ from tests.extractors.sample_data import (
 )
 
 
-def tests_authentication(
+def _tests_authentication(
     ner_extractor_configs,
 ):  # pylint: disable=redefined-outer-name
     """Tests that the environmental variables are set if passed."""
@@ -33,7 +33,7 @@ def tests_authentication(
         assert os.environ.get("KAGGLE_KEY") == ner_extractor_configs["auth_key"]
 
 
-def test_raw_extraction_read_concat(
+def _test_raw_extraction_read_concat(
     ner_extractor_configs, ner_txt_sample, ner_sample_df
 ):  # pylint: disable=redefined-outer-name
     """For given file test that extraction read them and return wanted df."""
@@ -55,7 +55,7 @@ def test_raw_extraction_read_concat(
         assert_frame_equal(df, ner_sample_df)
 
 
-def test_raw_extraction_tmp_dir(
+def _test_raw_extraction_tmp_dir(
     ner_extractor_configs,
 ):  # pylint: disable=redefined-outer-name
     """Test that a dir not exist after and before the extraction call"""
@@ -74,7 +74,7 @@ def test_raw_extraction_tmp_dir(
         assert not os.path.isdir(download_file_path)
 
 
-def test_preprocess(
+def _test_preprocess(
     ner_extractor_configs, ner_sample_df, ner_sample_preprocessed
 ):  # pylint: disable=redefined-outer-name
     """For a given df test that return preprocessed df"""

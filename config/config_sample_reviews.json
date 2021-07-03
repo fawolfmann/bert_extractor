@@ -1,0 +1,11 @@
+{
+    "extractor_type": "reviews",
+    "extractor_config": {
+        "pretrained_model_name_or_path": "bert-base-uncased",
+        "sentence_col": "text",
+        "labels_col": "label",
+        "cache_filepath": "./data/",
+        "read_cache": true
+    },
+    "extractor_url": "magazine"
+}
