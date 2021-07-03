@@ -3,8 +3,8 @@
 from gzip import decompress
 import json
 import logging
+from typing import Dict, List, Tuple
 
-import pandas as pd
 import requests
 
 from bert_extractor.extractors.base import BaseBERTExtractor
@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class ReviewsExtractor(BaseBERTExtractor):
-    def extract_raw(self, url: str) -> pd.DataFrame:
-        """Download the url for Amazon reviews cast to a DataFrame.
+    def extract_raw(self, url: str) -> Dict:
+        """Download the url for Amazon reviews cast to a dict.
 
         Note: the unzipped string containts jsons bad formated, here we cast them to one df.
         example of raw data:
@@ -30,41 +30,41 @@ class ReviewsExtractor(BaseBERTExtractor):
 
         Returns
         -------
-        pd.DataFrame
-            df with all the data extracted.
+        Dict
+            dict with all the data extracted.
         """
         logger.info("Going to get data from %s", url)
-
-        df = pd.DataFrame(
-            json.loads(
-                "["
-                + decompress(requests.get(url).content)
-                .decode("utf-8")
-                .replace("}\n{", "},{")
-                + "]"
-            )
+        loaded_dict = json.loads(
+            "["
+            + decompress(requests.get(url).content)
+            .decode("utf-8")
+            .replace("}\n{", "},{")
+            + "]"
         )
-        logger.info("Extraction successfull")
-        return df
 
-    def preprocess(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Create the columns with the sentences and labels.
+        logger.info("Extraction successfull")
+        return loaded_dict
+
+    def preprocess(self, loaded_dict: Dict) -> Tuple[List, List]:
+        """Create two lists with the sentences and labels.
 
         Parameters
         ----------
-        df : pd.DataFrame
+        loaded_dict : Dict
             extracted raw data.
 
         Returns
         -------
-        pd.DataFrame
-            processed df.
+        Tuple[List, List]
+            - list of raw words.
+            - list of raw labels.
         """
-        df[self.sentence_col] = df["summary"] + " : " + df["reviewText"]
-        # REVIEW THIS LINE, see if we can remove it and it dont break the dropna()
-        df[self.labels_col] = df["overall"].astype(int)
-        df = df[[self.labels_col, self.sentence_col]]
-        df.dropna(inplace=True)
+        sentences = []
+        labels = []
+        for raw in loaded_dict:
+            sentences.append(raw.get("summary", "") + " : " + raw.get("reviewText", ""))
+            labels.append(raw["overall"])
+
         logger.info("Preproccessed dataframe")
 
-        return df
+        return sentences, labels
