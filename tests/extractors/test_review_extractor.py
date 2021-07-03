@@ -12,7 +12,7 @@ from tests.extractors.sample_data import (
 )
 
 
-def test_raw_extraction_request(
+def _test_raw_extraction_request(
     extractor_configs,
 ):  # pylint: disable=redefined-outer-name
     with patch("requests.get") as requests:
@@ -24,7 +24,7 @@ def test_raw_extraction_request(
         requests.assert_called_once_with(url)
 
 
-def test_raw_extraction_response(
+def _test_raw_extraction_response(
     extractor_configs, sample_df
 ):  # pylint: disable=redefined-outer-name
     with patch("requests.get") as requests:
@@ -35,7 +35,7 @@ def test_raw_extraction_response(
         assert_frame_equal(df, sample_df)
 
 
-def test_raw_extraction_decompress(
+def _test_raw_extraction_decompress(
     extractor_configs, sample_df
 ):  # pylint: disable=redefined-outer-name
     with patch("bert_extractor.extractors.reviews.decompress") as decompress, patch(
@@ -49,7 +49,7 @@ def test_raw_extraction_decompress(
         assert_frame_equal(df, sample_df)
 
 
-def test_preprocess(
+def _test_preprocess(
     extractor_configs, sample_df, sample_preprocessed
 ):  # pylint: disable=redefined-outer-name
     reviews_extractor = ReviewsExtractor(**extractor_configs)
