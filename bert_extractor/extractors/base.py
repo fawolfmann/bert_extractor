@@ -2,12 +2,11 @@
 from abc import ABC
 import logging
 import os
-from typing import NamedTuple, Union
+from typing import Dict, List, NamedTuple, Optional, Tuple, Union
 
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import train_test_split
-from transformers import BertTokenizer
+from transformers import AutoTokenizer
 
 
 class TokenizedTensor(NamedTuple):
@@ -23,8 +22,6 @@ class TokenizedTensor(NamedTuple):
 
 logger = logging.getLogger(__name__)
 
-COMPRESSION = "gzip"
-
 
 class BaseBERTExtractor(ABC):
     def __init__(
@@ -32,8 +29,11 @@ class BaseBERTExtractor(ABC):
         pretrained_model_name_or_path: Union[str, os.PathLike],
         sentence_col: str,
         labels_col: str,
+        auth_username: Optional[str] = None,
+        auth_key: Optional[str] = None,
         split_test_size: float = 0.1,
         cache_path: Union[str, os.PathLike] = "/tmp/bert_extractor",
+        read_cache: bool = False,
     ):
         """Base class to extract bert classification data from any datasource.
 
@@ -45,16 +45,29 @@ class BaseBERTExtractor(ABC):
             name of the column of from where it will be the text.
         labels_col : str
             name of the column of from where it will be the label.
+        auth_username : Optional, str
+            username to configure authentication.
+        auth_key: Optional, str
+            private key to configure authentication.
         split_test_size : float
             amount of dataset to use for test, between [0,1].
         cache_path : Union[str, os.PathLike]
             path to store cached raw data.
+        read_cache : bool
+            True to read from cache_path
         """
-        self.cache_path = cache_path
         self.pretrained_model_name_or_path = pretrained_model_name_or_path
         self.sentence_col = sentence_col
         self.labels_col = labels_col
         self.test_size = split_test_size
+        self.auth_username = auth_username
+        self.auth_key = auth_key
+        self.cache_path = cache_path
+        self.read_cache = read_cache
+        self.token_classification = False
+
+    def authenticate(self):
+        """Authenticate to a services if needed"""
 
     def extract_preprocess(self, url: str) -> TokenizedTensor:
         """Extract and preprocess data, for BERT tasks.
@@ -74,13 +87,13 @@ class BaseBERTExtractor(ABC):
         TokenizedTensor
             Extracted and preprocessed data to consume BERT model.
         """
-        raw_df = self.extract_raw(url)
-        df = self.preprocess(raw_df)
-        self.validate_df(df)
+        self.authenticate()
+        extracted = self.extract_raw(url)
+        sentences, labels = self.preprocess(extracted)
 
-        return self.bert_tokenizer(df)
+        return self.bert_tokenizer(sentences, labels)
 
-    def extract_raw(self, url: str) -> pd.DataFrame:
+    def extract_raw(self, url: str) -> Dict:
         """Extract raw data from a url.
         If data is cached return cache if not it will download it.
         
@@ -91,58 +104,70 @@ class BaseBERTExtractor(ABC):
         
         Returns
         -------
-        pd.DataFrame
-            Extracted data converted to DataFrame.
+        Tuple[List, List]
+            - list of raw words.
+            - list of raw labels.
         """
-        return pd.DataFrame()
+        return {}
 
-    def preprocess(self, df: pd.DataFrame) -> pd.DataFrame:
+    def preprocess(self, extracted_raw: Dict) -> Tuple[List, List]:
         """Preprocess data for Bert Classification problem.
         
         Parameters
         ----------
-        df : pd.DataFrame
-            raw df extracted.
-        
+        extracted_raw: Dict
+            self.sentence_col : extracted raw words list.
+            self.labels_col: extracted raw labels list.
+
         Returns
         -------
-        pd.DataFrame
-            Preprocessed df of shape ...
+        Tuple[List, List]
+            - sentences: preprocessed sentences. 
+            - labels: preprocessed labels.
         """
-        return pd.DataFrame()
+        return extracted_raw[self.sentence_col], extracted_raw[self.labels_col]
 
-    def bert_tokenizer(self, df: pd.DataFrame) -> TokenizedTensor:
+    def bert_tokenizer(self, sentences: List, labels: List) -> TokenizedTensor:
         """Map the given text to their IDs, prepend the `[CLS]` token to the start,
         append the `[SEP]` token to the end, pad or truncate the sentence to the max text length,
         and create attention masks for [PAD] tokens.
 
         Parameters
         ----------
-        df : pd.DataFrame
-            DataFrame with the processed data to tokenize.
+        sentences : List
+            sentences to tokenize.
+        labels: List
+            labels to processes if needed.
 
         Returns
         -------
             TokenizedTensor tuple of numpy array.
 
         Note:
-            - The parameters bert pretained model named, columns of sentence and label 
-            are set in the configs.
-            - I use numpy return tensor so that this projects
+            - The parameters bert pretained model named is set in the configs.
+            - I use numpy return tensor so that this project
             isn't dependant on TensorFlow or PyTorch. 
 
         """
         input_ids = []
         attention_masks = []
+        words_id = []
+
         logger.info("Pretrained model name: %s", self.pretrained_model_name_or_path)
-        tokenizer = BertTokenizer.from_pretrained(
-            self.pretrained_model_name_or_path, do_lower_case=True
+        tokenizer = AutoTokenizer.from_pretrained(
+            self.pretrained_model_name_or_path, do_lower_case=True, use_fast=True,
         )
-
-        sentences = df[self.sentence_col].values
-        labels = df[self.labels_col].values
-
-        max_length = min(max(len(tokenizer.encode(sent)) for sent in sentences), 512)
+        if self.token_classification:
+            max_length = self._round_nearst_pow(
+                min(
+                    max(len(tokenizer.encode(" ".join(sent))) for sent in sentences),
+                    512,
+                )
+            )
+        else:
+            max_length = self._round_nearst_pow(
+                min(max(len(tokenizer.encode(sent)) for sent in sentences), 512)
+            )
         logger.info("Max sentences length %s", max_length)
 
         for sent in sentences:
@@ -152,12 +177,16 @@ class BaseBERTExtractor(ABC):
                 max_length=max_length,
                 padding="max_length",
                 return_attention_mask=True,
+                is_split_into_words=self.token_classification,
                 return_tensors="np",
             )
-
             input_ids.append(encoded_dict["input_ids"])
             attention_masks.append(encoded_dict["attention_mask"])
-        logger.info("Tokenized %s sentence", len(sentences))
+            if self.token_classification:
+                words_id.append(encoded_dict.word_ids())
+
+        # TODO map this
+        labels = self.process_labels(labels, words_id)
 
         return TokenizedTensor(
             *train_test_split(
@@ -169,25 +198,21 @@ class BaseBERTExtractor(ABC):
             )
         )
 
-    def validate_df(self, df: pd.DataFrame):
-        """Validate that the data satisfy defined criteria.
-        
+    def _round_nearst_pow(self, number: int) -> int:
+        """Round max length to a higher power of 8 to use NVIDIA GPU.
+
         Parameters
         ----------
-        df : pd.DataFrame
-            raw df extracted.
+        number : int
+            number to round
 
-        Raises
-        ------
-        ValueError
-            if df does not containts labels_col and sentence_col.
-            
+        Returns
+        -------
+        int
+            rounded number.
         """
-        if self.labels_col not in df.columns:
-            error = f"DataFrame does not contains labels column {self.labels_col} check the configuration or the preprocess method."
-            logger.error(error)
-            raise ValueError(error)
-        if self.sentence_col not in df.columns:
-            error = f"DataFrame does not contains sentence column {self.sentence_col} check the configuration or the preprocess method."
-            logger.error(error)
-            raise ValueError(error)
+        return (number + 7) & (-8)
+
+    def process_labels(self, labels: List, words_ids: List) -> np.array:
+        """Process labels if needed"""
+        return np.array(labels)
