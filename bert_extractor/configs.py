@@ -65,4 +65,3 @@ def _validate_config(config: Dict):
             error_message = f"Unknown extractor type, knows {KNOWN_REVIEWS_URLS}"
             logger.error(error_message)
             raise ValueError(error_message)
-

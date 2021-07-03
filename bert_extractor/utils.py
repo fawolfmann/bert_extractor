@@ -78,4 +78,3 @@ def store_tensor(tensor: Tuple[np.array], output_path: str, name: str):
 
     output_filepath = Path(output_path) / f"{name}_bert_extraction_tensor.pkl"
     to_pickle(output_filepath, tensor)
-
