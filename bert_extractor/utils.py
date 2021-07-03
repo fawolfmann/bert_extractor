@@ -1,47 +1,47 @@
 """Utils"""
-import json
-import logging
-import os
-import pickle
 from functools import wraps
+from hashlib import sha256
+import logging
 from pathlib import Path
-from typing import Any, Dict, Tuple, Union
+import pickle
+from typing import Any, Union
 
-import numpy as np
+from bert_extractor.extractors.base import TokenizedTensor
 
 logger = logging.getLogger(__name__)
 
 
-def use_cache(config: Dict, url: str):
+def cache_extract_raw():
     """Cache function results.
 
     Parameters
     ----------
-    config : Dict
-        configurations
-
-    to use: @use_cache(config=configs)
+    cache_path : str
+        path to save/load cache.
+    name: str
+        name of the file to cache.
+    cache_read: bool
+        True if try to read cache.
     """
 
     def use_cache_decorator(function):
         """Function result caching wrapper."""
 
         @wraps(function)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args):
+            cache_path = args[0].cache_path
+            cache_read = args[0].read_cache
+            hashed_name = sha256((args[1]).encode()).hexdigest()
+            filepath = Path(cache_path) / f"{hashed_name}.pkl"
 
-            filepath = Path(config["cache_filepath"]) / f"{url}.pkl"
-
-            if config["read_cache"] and filepath.exists():
+            if cache_read and filepath.exists():
                 result = from_pickle(filepath)
                 logger.info("Using cached model: %s.", filepath)
             else:
-                result = function(*args, **kwargs)
-                if config["active"]:
-                    Path.mkdir(
-                        Path(config["cache_filepath"]), exist_ok=True, parents=True
-                    )
-                    to_pickle(filepath, result)
-                    logger.info("Cached model to: %s.", filepath)
+                result = function(*args)
+                Path.mkdir(Path(cache_path), exist_ok=True, parents=True)
+                to_pickle(filepath, result)
+                logger.info("Cached model to: %s.", filepath)
             return result
 
         return wrapper
@@ -64,12 +64,12 @@ def from_pickle(filepath: Union[str, Path]):
     return result
 
 
-def store_tensor(tensor: Tuple[np.array], output_path: str, name: str):
+def store_tensor(tensor: TokenizedTensor, output_path: str, name: str):
     """[summary]
 
     Parameters
     ----------
-    tensor : Tuple[np.array]
+    tensor : TokenizedTensor
         [description]
     output_path : str
         [description]

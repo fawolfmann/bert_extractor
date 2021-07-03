@@ -9,6 +9,7 @@ import numpy as np
 
 from bert_extractor.constants import NER_LABLES_MAP, SPECIAL_TOKEN_LABEL
 from bert_extractor.extractors.base import BaseBERTExtractor
+from bert_extractor.utils import cache_extract_raw
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +73,7 @@ class NERExtractor(BaseBERTExtractor):
         self.api = KaggleApi()
         self.api.authenticate()
 
+    @cache_extract_raw()
     def extract_raw(self, url: str) -> Dict:
         """Download the CoNLL 2003 files from Kaggle, into a temporary directory.
         Read them and delete the directory with it content.
