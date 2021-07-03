@@ -2,8 +2,9 @@
 
 import click
 
+from bert_extractor.configs import read_config
 from bert_extractor.extractors import BaseBERTExtractor, NERExtractor, ReviewsExtractor
-from bert_extractor.utils import read_config, store_tensor
+from bert_extractor.utils import store_tensor
 
 
 @click.command()
@@ -16,16 +17,16 @@ from bert_extractor.utils import read_config, store_tensor
 @click.option("--output_path", type=click.STRING, help="Path to output file")
 @click.option("--output_format", type=click.STRING, help="type of file to save")
 def main(config_path: str, output_path: str, output_format: str):
-    """[summary]
+    """Main function to implement Bert Extractors.
 
     Parameters
     ----------
     config_path : str
-        [description]
+        path to the configuration file.
     output_path : str
-        [description]
+        path to where store the output.
     output_format : str
-        [description]
+        desired output format option (pickle, zip, ...)
     """
     extractor: BaseBERTExtractor
     configs = read_config(config_path)
@@ -37,7 +38,8 @@ def main(config_path: str, output_path: str, output_format: str):
 
     tensor = extractor.extract_preprocess(configs["extractor_url"])
 
-    store_tensor(tensor, output_path, output_format)
+    store_name = configs["extractor_type"] + configs["extractor_url"]
+    store_tensor(tensor, output_path, store_name)
 
 
 if __name__ == "__main__":

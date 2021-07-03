@@ -1,0 +1,13 @@
+{
+    "extractor_type": "ner",
+    "extractor_config": {
+        "pretrained_model_name_or_path": "bert-base-uncased",
+        "sentence_col": "text",
+        "labels_col": "label",
+        "auth_username": "",
+        "auth_key": "",
+        "cache_filepath": "/tmp/bert_extraction/",
+        "read_cache": true
+    },
+    "extractor_url": "conll_2003"
+}
