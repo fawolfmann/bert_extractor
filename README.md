@@ -1,9 +1,9 @@
-# BERT data Extractor
+# BERT Data Extractor
 Python module to extract and preprocess data for BERT Classification.
 
 In this package you will find to types of extractors, one for Text Classification and other for Token Classification, each of them is extracting an associated dataset.
 
-BERT have specific format requires as inputs. A BERT model needs a tokenized words, the tokenaztion dependes on which BERT model we are using, you can find all the BERT models [here](https://huggingface.co/transformers/pretrained_models.html), also all of this BERTs models can be use in this package setting it in the configuration file.
+BERT requires specific format as inputs. A BERT model needs a tokenized words, the tokenaztion dependes on which BERT model we are using, you can find all the BERT models [here](https://huggingface.co/transformers/pretrained_models.html), also all of this BERTs models can be use in this package setting it in the configuration file.
 
 ## Install
 To install i used [Poetry](https://python-poetry.org/docs/) as environment isolation and dependencies solving tool.
@@ -110,7 +110,7 @@ The best way to go in production in my opinion y on a isolated environment, mana
 
 #### To Docker
 
-I add a [DockerFile](DockerFile) in this repo as an example on how i would run this on production.
+I add a [Dockerfile](Dockerfile) in this repo as an example on how i would run this on production.
 
 #### To pip
 Also if the requirements are others you can export this package to install it with pip. 
@@ -125,5 +125,9 @@ after that you can run :
 $ pip install -r requirements.txt
 ```
 
-### TODOs
-This package is in WIP there are some things in the code to improve, you will find the TODOs in the code.
+### Next Steps
+
+Note: This package is in WIP there are some things in the code to improve, you will find the TODOs in the code.
+
+- Implement with Airflow
+- Parallelize with Spark if the volume of data requires.
