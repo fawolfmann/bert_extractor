@@ -60,6 +60,9 @@ Example command to run this:
 $ poetry run main.py --config_path=../config/config_sample_ner.json --output_path=../data/
 ```
 
+### Quickstart
+Its provided a quickstart notebook to see the package in action and training a BERT model with the extracted and processed tensor.
+
 #### NER Dataset
 The NER dataset is a CoNLL 2003 problem (Token classification) its from Kaggle so i use Kaggle's API to download the dataset. But to pass the credentials at runtime I fork the [repo](https://github.com/fawolfmann/kaggle-api) so it don't authenticate when you import the package.
 To use it you have to set the [credentials](https://www.kaggle.com/docs/api#authentication) in the configuration file. Also i have a cached dataset on [data](./data) folder.
