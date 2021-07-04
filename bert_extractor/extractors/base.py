@@ -2,7 +2,7 @@
 from abc import ABC
 import logging
 import os
-from typing import Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, List, NamedTuple, Optional, Tuple, Union
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -35,7 +35,7 @@ class BaseBERTExtractor(ABC):
         cache_path: Union[str, os.PathLike] = "/tmp/bert_extractor",
         read_cache: bool = False,
     ):
-        """Base class to extract bert classification data from any datasource.
+        """Base class to extract BERT classification data from any datasource.
 
         Parameters
         ----------
@@ -93,7 +93,7 @@ class BaseBERTExtractor(ABC):
 
         return self.bert_tokenizer(sentences, labels)
 
-    def extract_raw(self, url: str) -> Dict:
+    def extract_raw(self, url: str) -> Any:
         """Extract raw data from a url.
         If data is cached return cache if not it will download it.
         
@@ -104,20 +104,18 @@ class BaseBERTExtractor(ABC):
         
         Returns
         -------
-        Tuple[List, List]
-            - list of raw words.
-            - list of raw labels.
+        Any
+            extracted raw data.
         """
         return {}
 
-    def preprocess(self, extracted_raw: Dict) -> Tuple[List, List]:
-        """Preprocess data for Bert Classification problem.
+    def preprocess(self, extracted_raw: Any) -> Tuple[List, List]:
+        """Preprocess data for BERT Classification problem.
         
         Parameters
         ----------
-        extracted_raw: Dict
-            self.sentence_col : extracted raw words list.
-            self.labels_col: extracted raw labels list.
+        extracted_raw: Any
+            extracted raw data on any format.
 
         Returns
         -------
@@ -144,7 +142,7 @@ class BaseBERTExtractor(ABC):
             TokenizedTensor tuple of numpy array.
 
         Note:
-            - The parameters bert pretained model named is set in the configs.
+            - The parameters BERT pretained model named is set in the configs.
             - I use numpy return tensor so that this project
             isn't dependant on TensorFlow or PyTorch. 
 
@@ -199,7 +197,7 @@ class BaseBERTExtractor(ABC):
         )
 
     def _round_nearst_pow(self, number: int) -> int:
-        """Round max length to a higher power of 8 to use NVIDIA GPU.
+        """Round max length to a higher power of 8 to power up NVIDIA GPUs.
 
         Parameters
         ----------
@@ -214,5 +212,18 @@ class BaseBERTExtractor(ABC):
         return (number + 7) & (-8)
 
     def process_labels(self, labels: List, words_ids: List) -> np.array:
-        """Process labels if needed"""
+        """Process labels if needed, for Token Classification this step change.
+
+        Parameters
+        ----------
+        labels : List
+            labels to process
+        words_ids : List
+            id of each token corresponding to a label.
+
+        Returns
+        -------
+        np.array
+            processed labels in as numpy.array.
+        """
         return np.array(labels)

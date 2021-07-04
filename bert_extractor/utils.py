@@ -12,16 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 def cache_extract_raw():
-    """Cache function results.
-
-    Parameters
-    ----------
-    cache_path : str
-        path to save/load cache.
-    name: str
-        name of the file to cache.
-    cache_read: bool
-        True if try to read cache.
+    """Cache extraction_raw results
+    this wrapper hash the given name and cache in the cache_path set.
     """
 
     def use_cache_decorator(function):
@@ -65,14 +57,14 @@ def from_pickle(filepath: Union[str, Path]):
 
 
 def store_tensor(tensor: TokenizedTensor, output_path: str, name: str):
-    """[summary]
+    """Store the output into a pickle object in the given path.
 
     Parameters
     ----------
     tensor : TokenizedTensor
-        [description]
+        Tensor processed and ready to use with BERT.
     output_path : str
-        [description]
+        path to store the pickled object.
     """
     Path.mkdir(Path(output_path), exist_ok=True, parents=True)
 
