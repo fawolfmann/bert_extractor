@@ -8,6 +8,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from transformers import AutoTokenizer
 
+logger = logging.getLogger(__name__)
+
 
 class TokenizedTensor(NamedTuple):
     """ Tuple of preprocessed tensors."""
@@ -18,9 +20,6 @@ class TokenizedTensor(NamedTuple):
     validation_labels: np.array
     train_mask: np.array
     validation_masks: np.array
-
-
-logger = logging.getLogger(__name__)
 
 
 class BaseBERTExtractor(ABC):
@@ -76,12 +75,12 @@ class BaseBERTExtractor(ABC):
             - preprocess
             - bert_tokenizer
             - validate
-        
+
         Parameters
         ----------
         url : str
             url to extract data from.
-        
+
         Returns
         -------
         TokenizedTensor
@@ -96,12 +95,12 @@ class BaseBERTExtractor(ABC):
     def extract_raw(self, url: str) -> Any:
         """Extract raw data from a url.
         If data is cached return cache if not it will download it.
-        
+
         Parameters
         ----------
         url : str
             url to extract data from.
-        
+
         Returns
         -------
         Any
@@ -111,7 +110,7 @@ class BaseBERTExtractor(ABC):
 
     def preprocess(self, extracted_raw: Any) -> Tuple[List, List]:
         """Preprocess data for BERT Classification problem.
-        
+
         Parameters
         ----------
         extracted_raw: Any
@@ -120,10 +119,10 @@ class BaseBERTExtractor(ABC):
         Returns
         -------
         Tuple[List, List]
-            - sentences: preprocessed sentences. 
+            - sentences: preprocessed sentences.
             - labels: preprocessed labels.
         """
-        return extracted_raw[self.sentence_col], extracted_raw[self.labels_col]
+        return (extracted_raw[self.sentence_col], extracted_raw[self.labels_col])
 
     def bert_tokenizer(self, sentences: List, labels: List) -> TokenizedTensor:
         """Map the given text to their IDs, prepend the `[CLS]` token to the start,
@@ -144,7 +143,7 @@ class BaseBERTExtractor(ABC):
         Note:
             - The parameters BERT pretained model named is set in the configs.
             - I use numpy return tensor so that this project
-            isn't dependant on TensorFlow or PyTorch. 
+            isn't dependant on TensorFlow or PyTorch.
 
         """
         input_ids = []

@@ -17,9 +17,7 @@ from tests.extractors.sample_data import (
 )
 
 
-def tests_authentication(
-    ner_extractor_configs,
-):  # pylint: disable=redefined-outer-name
+def tests_authentication(ner_extractor_configs,):
     """Tests that the environmental variables are set if passed."""
     with patch("bert_extractor.extractors.ner.KaggleApi.authenticate"):
         ner_extractor = NERExtractor(**ner_extractor_configs)
@@ -35,7 +33,7 @@ def tests_authentication(
 
 def test_raw_extraction_read_concat(
     ner_extractor_configs, ner_txt_sample, ner_sample_raw
-):  # pylint: disable=redefined-outer-name
+):
     """For given file test that extraction read them and return wanted df."""
     with patch("bert_extractor.extractors.ner.KaggleApi"):
 
@@ -55,9 +53,7 @@ def test_raw_extraction_read_concat(
         assert extracted_raw == ner_sample_raw
 
 
-def test_raw_extraction_tmp_dir(
-    ner_extractor_configs,
-):  # pylint: disable=redefined-outer-name
+def test_raw_extraction_tmp_dir(ner_extractor_configs,):
     """Test that a dir not exist after and before the extraction call"""
     with patch("bert_extractor.extractors.ner.KaggleApi"), patch(
         "bert_extractor.extractors.ner.NERExtractor._read_conll_file"
@@ -80,9 +76,7 @@ def test_raw_extraction_tmp_dir(
                 shutil.rmtree(download_file_path)
 
 
-def test_preprocess(
-    ner_extractor_configs, ner_sample_raw, ner_sample_preprocessed
-):  # pylint: disable=redefined-outer-name
+def test_preprocess(ner_extractor_configs, ner_sample_raw, ner_sample_preprocessed):
     """For a given df test that return preprocessed df"""
     ner_extractor = NERExtractor(**ner_extractor_configs)
     preprocessed_data = ner_extractor.preprocess(ner_sample_raw)

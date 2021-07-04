@@ -79,7 +79,7 @@ class NERExtractor(BaseBERTExtractor):
         """Download the CoNLL 2003 files from Kaggle, into a temporary directory.
         Read them and delete the directory with it content.
 
-        Note: 
+        Note:
 
         Parameters
         ----------
@@ -164,7 +164,7 @@ class NERExtractor(BaseBERTExtractor):
         Returns
         -------
         Tuple[List, List]
-            - sentences: list of list of sentences. 
+            - sentences: list of list of sentences.
             - labels: list of list of mapped labels.
 
         Raises
@@ -206,7 +206,7 @@ class NERExtractor(BaseBERTExtractor):
         """Align and pad labels.
         Pad all labels to the same length that tokens, adding -100 for no tokens.
         Add -100 for `[CLS]` and `[SEP]` tokens.
-        
+
         Note: BERT can break a word into several so that is needed words_ids.
 
 
