@@ -26,26 +26,28 @@ class NERExtractor(BaseBERTExtractor):
         cache_path: Union[str, os.PathLike] = "/tmp/bert_extractor",
         read_cache: bool = False,
     ):
-        """[summary]
+        """Name Entity Recognition Extractor.
+        Extract and preprocess the data for a Token Classification problem,
+        now for CoNLL 2003 dataset.
 
         Parameters
         ----------
         pretrained_model_name_or_path : Union[str, os.PathLike]
-            [description]
+            pretained BERT name to tokenize the the input.
         sentence_col : str
-            [description]
+            name of the column of from where it will be the text.
         labels_col : str
-            [description]
-        auth_username : Optional[str]
-            [description]
-        auth_key : Optional[str]
-            [description]
+            name of the column of from where it will be the label.
+        auth_username : Optional, str
+            username to configure authentication.
+        auth_key: Optional, str
+            private key to configure authentication.
         split_test_size : float
-            [description]
+            amount of dataset to use for test, between [0,1].
         cache_path : Union[str, os.PathLike]
-            [description]
+            path to store cached raw data.
         read_cache : bool
-            [description]
+            True to read from cache_path
         """
         super().__init__(
             pretrained_model_name_or_path,
@@ -57,7 +59,6 @@ class NERExtractor(BaseBERTExtractor):
             cache_path=cache_path,
             read_cache=read_cache,
         )
-        # CHECK IF THIS IS OK
         self.api: KaggleApi = None
         self.token_classification = True
 
@@ -96,11 +97,11 @@ class NERExtractor(BaseBERTExtractor):
         self.api.dataset_download_files(
             url, path=download_file, unzip=True,
         )
-        df_splits = ["train", "valid", "test"]
+        dataset_types = ["train", "valid", "test"]
         words_all = []
         labels_all = []
-        for splits in df_splits:
-            file_path = f"{download_file}/{splits}.txt"
+        for d_types in dataset_types:
+            file_path = f"{download_file}/{d_types}.txt"
             words = []
             labels = []
 
@@ -159,6 +160,7 @@ class NERExtractor(BaseBERTExtractor):
         sentence = []
         label_list = []
         labels = []
+        # TODO map this
         for word, label in zip(words_raw, labels_raw):
             if word:
                 if word != "-DOCSTART-":
@@ -180,14 +182,16 @@ class NERExtractor(BaseBERTExtractor):
         """Align and pad labels.
         Pad all labels to the same length that tokens, adding -100 for no tokens.
         Add -100 for `[CLS]` and `[SEP]` tokens.
+        
+        Note: BERT can break a word into several so that is needed words_ids.
 
 
         Parameters
         ----------
         labels : List[List]
             preprocessed labels.
-        max_length: int
-            maximum length of tokens.
+        words_ids: List[List]
+            words id number to use for process.
 
         Returns
         -------
@@ -195,7 +199,7 @@ class NERExtractor(BaseBERTExtractor):
             labels to train a model.
         """
         new_labels = []
-
+        # TODO map this
         for label, word_idx in zip(labels, words_ids):
             previous_idx = None
             new_label = []

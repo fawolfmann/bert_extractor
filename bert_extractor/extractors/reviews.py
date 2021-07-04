@@ -3,7 +3,7 @@
 from gzip import decompress
 import json
 import logging
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 import requests
 
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class ReviewsExtractor(BaseBERTExtractor):
     @cache_extract_raw()
-    def extract_raw(self, url: str) -> Dict:
+    def extract_raw(self, url: str) -> List:
         """Download the url for Amazon reviews cast to a dict.
 
         Note: the unzipped string containts jsons bad formated, here we cast them to one df.
@@ -32,8 +32,8 @@ class ReviewsExtractor(BaseBERTExtractor):
 
         Returns
         -------
-        Dict
-            dict with all the data extracted.
+        List
+            list with all the data extracted.
         """
         logger.info("Going to get data from %s", url)
         loaded_dict = json.loads(
@@ -47,12 +47,12 @@ class ReviewsExtractor(BaseBERTExtractor):
         logger.info("Extraction successfull")
         return loaded_dict
 
-    def preprocess(self, loaded_dict: Dict) -> Tuple[List, List]:
+    def preprocess(self, extracted_data: List) -> Tuple[List, List]:
         """Create two lists with the sentences and labels.
 
         Parameters
         ----------
-        loaded_dict : Dict
+        extracted_data : List
             extracted raw data.
 
         Returns
@@ -63,7 +63,7 @@ class ReviewsExtractor(BaseBERTExtractor):
         """
         sentences = []
         labels = []
-        for raw in loaded_dict:
+        for raw in extracted_data:
             sentences.append(raw.get("summary", "") + " : " + raw.get("reviewText", ""))
             labels.append(raw["overall"])
 
