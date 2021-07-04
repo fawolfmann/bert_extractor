@@ -97,25 +97,13 @@ class NERExtractor(BaseBERTExtractor):
         self.api.dataset_download_files(
             url, path=download_file, unzip=True,
         )
+        # TODO make this optional or read from configs.
         dataset_types = ["train", "valid", "test"]
         words_all = []
         labels_all = []
         for d_types in dataset_types:
             file_path = f"{download_file}/{d_types}.txt"
-            words = []
-            labels = []
-
-            if not os.path.isfile(file_path):
-                error = f"File {file_path} don't exists."
-                logger.error(error)
-                raise ValueError(error)
-
-            with open(file_path) as file:
-                for line in file:
-                    line = line.rstrip()
-                    items = line.split(" ")
-                    words.append(items[0])
-                    labels.append(items[-1])
+            words, labels = self._read_conll_file(file_path=file_path)
             words_all.extend(words)
             labels_all.extend(labels)
 
@@ -123,6 +111,42 @@ class NERExtractor(BaseBERTExtractor):
         extracted = {self.sentence_col: words_all, self.labels_col: labels_all}
         logger.info("Extraction successfull")
         return extracted
+
+    def _read_conll_file(self, file_path: Union[os.PathLike, str]) -> Tuple[List, List]:
+        """Read given file path, supouse to be a CoNLL 2003 file.
+
+        Parameters
+        ----------
+        file_path : os.PathLike
+            path for where is the file.
+
+        Returns
+        -------
+        Tuple[List, List]
+            - words : read words form file.
+            - labels : read labels form file.
+
+        Raises
+        ------
+        ValueError
+            if file_path doesn't contain a file.
+        """
+        words = []
+        labels = []
+
+        if not os.path.isfile(file_path):
+            error = f"File {file_path} don't exists."
+            logger.error(error)
+            raise ValueError(error)
+
+        with open(file_path) as file:
+            for line in file:
+                line = line.rstrip()
+                items = line.split(" ")
+                words.append(items[0])
+                labels.append(items[-1])
+
+        return words, labels
 
     def preprocess(self, extracted_raw: Dict) -> Tuple[List, List]:
         """Create the columns with the sentences and its labels.
