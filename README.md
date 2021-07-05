@@ -99,6 +99,8 @@ The reviews dataset is public but access is required in a google form. In the we
 
 This is a Text classification problem.
 
+Note: even is not a good practices commit data into github, in this time has been add an example of cached data in case there is no Kaggle API tokens.
+
 # CI
 This repo has a [Github action](.github/workflows/ci.yml) that executes the tests in the [tests](./tests) folder on each commit in a PR o merging process, they run with [nox](https://nox.thea.codes/en/stable/). Nox creates a virtual environment, install the package and run all the tests.
 
