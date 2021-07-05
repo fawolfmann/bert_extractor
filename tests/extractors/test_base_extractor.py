@@ -18,9 +18,15 @@ def test_bert_tokenizer_output(extractor_configs, sample_preprocessed):
     tensor = base.bert_tokenizer(*sample_preprocessed)
 
     assert len(tensor) == 4
-    assert len(tensor.validation_inputs) == len(sample_preprocessed) * base.test_size
+    assert (
+        len(tensor.validation_inputs["input_ids"])
+        == len(sample_preprocessed) * base.test_size
+    )
     assert set(np.unique(tensor.validation_inputs["attention_mask"][0])) == set([0, 1])
-    assert tensor.validation_inputs[0].shape[1] == tensor.train_inputs[0].shape[1]
+    assert (
+        tensor.validation_inputs["input_ids"][0].shape[0]
+        == tensor.train_inputs["input_ids"][0].shape[0]
+    )
 
 
 def test_bert_tokenizer_model_name(extractor_configs, sample_preprocessed):
