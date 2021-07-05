@@ -6,7 +6,6 @@ authors = ["fawolfmann <fawolfmann@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-pandas = "^1.2.3"
 transformers = "^4.7.0"
 scikit-learn = "^0.24"
 kaggle = {git = "https://github.com/fawolfmann/kaggle-api"}
