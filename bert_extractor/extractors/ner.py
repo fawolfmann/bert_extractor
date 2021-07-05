@@ -184,7 +184,6 @@ class NERExtractor(BaseBERTExtractor):
         sentence = []
         label_list = []
         labels = []
-
         for word, label in zip(words_raw, labels_raw):
             if word:
                 if word != "-DOCSTART-":

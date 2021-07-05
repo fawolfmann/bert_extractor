@@ -1,7 +1,7 @@
 # BERT Data Extractor
 Python module to extract and preprocess data for BERT classification.
 
-In this package, you will find two types of extractors, one for Text Classification and another one for Token Classification, each of them extracts an associated dataset. It can also be extended to use with other NLP problems.
+In this package, there are two types of extractors, one for Text Classification and another one for Token Classification, each of them extracts an associated dataset. It can also be extended to use with other NLP problems.
 
 BERT requires specific format as input. A BERT model needs tokenized words, the tokenization depends on which BERT model is selected.
 All BERTs models are defined [here](https://huggingface.co/transformers/pretrained_models.html). All of these BERTs models can be used in the package setting in the configuration file.
@@ -117,10 +117,10 @@ For each new feature,  a new branch in the project, and a pull request were crea
 This helped to work in different parts of the project at the same time.
 
 ## Production
-For production, It is suggested using data pipeline tools such as Airflow, Prefect, Dagster or any other. These tools help to maintain the data pipeline, knowing when a process fails, adding retrying tools, using sensor, resource allocation, and many more.
+For production, It is suggested to use data pipeline tools such as Airflow, Prefect, Dagster or any other. These tools help to maintain the data pipeline, knowing when a process fails, adding retrying tools, using sensor, resource allocation, and many more.
 
 ### Pin versions
-When going to production, it is desirable to pin the exact version of your package dependencies because you do not want any update of a dependency that can break your package.
+When going to production, it is desirable to pin the exact version of your package dependencies because any update of a dependency that can break your package.
 
 ### Poetry to production
 The best way to go in production is on an isolated environment, managed with docker or any other virtual environment tool.

@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 class ReviewsExtractor(BaseBERTExtractor):
+    """Extractor for Amazon Reviews"""
+
     @cache_extract_raw()
     def extract_raw(self, url: str) -> List:
         """Download the url for Amazon reviews cast to a dict.
