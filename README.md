@@ -138,7 +138,7 @@ Also if the requirements are others,  this package can be export to install it w
 
 this command creates a `requirements.txt`:
 ```
-$ poetry export -f requirements.txt --output requirements.txt
+$ poetry export --without-hashes -f requirements.txt --output requirements.txt
 ```
 after that install it with:
 ```
