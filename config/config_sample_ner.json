@@ -6,7 +6,7 @@
         "labels_col": "label",
         "auth_username": "",
         "auth_key": "",
-        "cache_filepath": "/tmp/bert_extraction/",
+        "cache_filepath": "./data/ner",
         "read_cache": true
     },
     "extractor_url": "conll_2003"
