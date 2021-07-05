@@ -7,6 +7,7 @@ from typing import Any, List, NamedTuple, Optional, Tuple, Union
 import numpy as np
 from sklearn.model_selection import train_test_split
 from transformers import AutoTokenizer
+from transformers.tokenization_utils_base import BatchEncoding, PreTrainedTokenizerBase
 
 logger = logging.getLogger(__name__)
 
@@ -14,12 +15,10 @@ logger = logging.getLogger(__name__)
 class TokenizedTensor(NamedTuple):
     """ Tuple of preprocessed tensors."""
 
-    train_inputs: np.array
-    validation_inputs: np.array
+    train_inputs: BatchEncoding
+    validation_inputs: BatchEncoding
     train_labels: np.array
     validation_labels: np.array
-    train_mask: np.array
-    validation_masks: np.array
 
 
 class BaseBERTExtractor(ABC):
@@ -146,10 +145,6 @@ class BaseBERTExtractor(ABC):
             isn't dependant on TensorFlow or PyTorch.
 
         """
-        input_ids = []
-        attention_masks = []
-        words_id = []
-
         logger.info("Pretrained model name: %s", self.pretrained_model_name_or_path)
         tokenizer = AutoTokenizer.from_pretrained(
             self.pretrained_model_name_or_path, do_lower_case=True, use_fast=True,
@@ -163,37 +158,70 @@ class BaseBERTExtractor(ABC):
             )
         else:
             max_length = self._round_nearst_pow(
-                min(max(len(tokenizer.encode(sent)) for sent in sentences), 512)
+                min(
+                    max(len(tokenizer.encode(sent)) for sent in sentences),
+                    tokenizer.model_max_length,
+                )
             )
         logger.info("Max sentences length %s", max_length)
-
-        for sent in sentences:
-            encoded_dict = tokenizer.encode_plus(
-                sent,
-                add_special_tokens=True,
-                max_length=max_length,
-                padding="max_length",
-                return_attention_mask=True,
-                is_split_into_words=self.token_classification,
-                return_tensors="np",
-            )
-            input_ids.append(encoded_dict["input_ids"])
-            attention_masks.append(encoded_dict["attention_mask"])
-            if self.token_classification:
-                words_id.append(encoded_dict.word_ids())
-
-        # TODO map this
-        labels = self.process_labels(labels, words_id)
+        train_sentences, val_sentences, train_labels, val_labels = train_test_split(
+            sentences, labels, random_state=2020, test_size=self.test_size,
+        )
+        train_tokenized, train_labels = self._tokenize_split(
+            train_sentences, train_labels, max_length, tokenizer
+        )
+        val_tokenized, val_labels = self._tokenize_split(
+            val_sentences, val_labels, max_length, tokenizer
+        )
 
         return TokenizedTensor(
-            *train_test_split(
-                input_ids,
-                labels,
-                attention_masks,
-                random_state=2020,
-                test_size=self.test_size,
-            )
+            train_inputs=train_tokenized,
+            validation_inputs=val_tokenized,
+            train_labels=train_labels,
+            validation_labels=val_labels,
         )
+
+    def _tokenize_split(
+        self,
+        sentences: List[str],
+        labels: List,
+        max_length: int,
+        tokenizer: PreTrainedTokenizerBase,
+    ) -> Tuple[BatchEncoding, List]:
+        """Helper function to tokenize and align and pad sentences and labels.
+
+        Parameters
+        ----------
+        sentences : List[str]
+            list of sentences to tokenize.
+        labels : List
+            list of labels to process.
+        max_length : int
+            max length of the encoded sentences.
+        tokenizer : PreTrainedTokenizerBase
+            tokenizer created to process the sentences.
+
+        Returns
+        -------
+        Tuple[BatchEncoding, List]
+            - tokenized: tokenized sentences to use with BERT model.
+            - labels : np.array processed labels
+
+        """
+        tokenized = tokenizer(
+            sentences,
+            add_special_tokens=True,
+            max_length=max_length,
+            padding="max_length",
+            truncation=True,
+            return_attention_mask=True,
+            is_split_into_words=self.token_classification,
+            return_tensors="np",
+        )
+
+        labels = self.process_labels(labels, tokenized)
+
+        return tokenized, labels
 
     def _round_nearst_pow(self, number: int) -> int:
         """Round max length to a higher power of 8 to power up NVIDIA GPUs.
@@ -210,8 +238,10 @@ class BaseBERTExtractor(ABC):
         """
         return (number + 7) & (-8)
 
-    def process_labels(self, labels: List, words_ids: List) -> np.array:
-        """Process labels if needed, for Token Classification this step change.
+    def process_labels(
+        self, labels: List, tokenized_sentences: BatchEncoding
+    ) -> np.array:
+        """Process labels if needed.
 
         Parameters
         ----------

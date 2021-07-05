@@ -1,21 +1,25 @@
 # BERT Data Extractor
-Python module to extract and preprocess data for BERT Classification.
+Python module to extract and preprocess data for BERT classification.
 
-This package contains two types of extractors, one for Text Classification and other for Token Classification, each of them is extracting an associated dataset. It can also be extended to use other NLP problems.
+In this package, you will find two types of extractors, one for Text Classification and another one for Token Classification, each of them extracts an associated dataset. It can also be extended to use with other NLP problems.
 
-BERT requires specific format as inputs. A BERT model needs a tokenized words, the tokenization depends on which BERT model is selected, all BERTs models are defined [here](https://huggingface.co/transformers/pretrained_models.html), also all of this BERTs models can be use in this package setting it in the configuration file.
+BERT requires specific format as input. A BERT model needs tokenized words, the tokenization depends on which BERT model is selected.
+All BERTs models are defined [here](https://huggingface.co/transformers/pretrained_models.html). All of these BERTs models can be used in the package setting in the configuration file.
 
-## Install
-To install i used [Poetry](https://python-poetry.org/docs/) as environment isolation and dependencies solving tool.
+# Installation
+## Installation with Poetry (Recommended)
+
+This package was developed with [Poetry](https://python-poetry.org/docs/) as an environment isolation and dependencies solving tool.
 
 To install Poetry download the source and run it:
 
-install:
+install and add it to the shell:
 ```
 $ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+$ source $HOME/.poetry/env
 ```
 
-uninstall Poetry:
+to uninstall Poetry:
 ```
 $ python get-poetry.py --uninstall
 $ POETRY_UNINSTALL=1 python get-poetry.py
@@ -26,6 +30,12 @@ $ POETRY_UNINSTALL=1 python get-poetry.py
 To install the package run:
 ```
 $ poetry install
+```
+
+## Installation with pip
+Also provided another way to install this package:
+```
+$ pip install -r requirements.txt
 ```
 
 ## Project structure
@@ -51,91 +61,87 @@ bert_extractor
         └── sample_data: examples of data to test.
 ```
 
-## Run
-For running purpose i created a [main.py](./bert_extractor/main.py) file that instantiate the extractors and execute them depending the configuration you set. It is also executable with CLI for that reason i use [Click](https://click.palletsprojects.com/en/8.0.x/) package.
+## Running
+For running purpose, a [main.py](./bert_extractor/main.py) file was created that instantiate the extractors and execute them depending on the configuration set. It is also executable with CLI using [Click](https://click.palletsprojects.com/en/8.0.x/) package.
 
-### How to run it
-Example command to run this:
+### Running Procedure
+Example command to run this package:
 ```
-$ poetry run main.py --config_path=../config/config_sample_ner.json --output_path=../data/
+$ poetry run main.py --config_path=../config/config_sample_reviews.json --output_path=../data/
 ```
 
 ### Quickstart
-Its provided a quickstart notebook to see the package in action and training a BERT model with the extracted and processed tensor.
+It is provided a [quickstart](quickstart.ipynb) notebook to see the package in action and training a BERT model with the extracted and processed tensor.
 
 ## Extractors
 
-I create a base class for extraction and use inheritance for the specifics extractors.
+There is a base class for extraction and each subclass inherits it for specific extractors.
 
-I thought this problem as a data pipeline so for that reason i created the methods for each step:
+![](bert_extractor.png)
+
+This problem is a data pipeline, so for that reason methods were created for each step:
+
 - Extraction raw data.
 - Preprocess raw data.
 - BERT tokenization
     - Labels tokenization (if needed).
 - Save tokenized output.
 
-# Add pipeline diagram.
-
+### Types of datasets
 #### NER Dataset
-The NER dataset is a CoNLL 2003 problem (Token classification) its from Kaggle so i use Kaggle's API to download the dataset. But to pass the credentials at runtime I fork the [repo](https://github.com/fawolfmann/kaggle-api) so it don't authenticate when you import the package.
-To use it you have to set the [credentials](https://www.kaggle.com/docs/api#authentication) in the configuration file. Also i have a cached dataset on [data](./data) folder.
+The NER dataset is a CoNLL 2003 problem (Token classification). It is from Kaggle, so Kaggle's API was needed to download the dataset.
+In order to pass the credentials at runtime the [repo](https://github.com/fawolfmann/kaggle-api) was forked so it did not authenticate when the package was imported.
 
+So as to use it, the [credentials](https://www.kaggle.com/docs/api#authentication) have to be set in the configuration file. In addition, a cached dataset on [data](./data) folder is kept.
 
 #### Amazon Reviews Dataset
-The reviews dataset is public but you have to require access in a google form. In the web page there is a light dataset to use in development time, also i cached one dataset so you can try it.
+The reviews dataset is public but access is required in a google form. In the web page, there is a light dataset to use in development time; also there is cached one dataset to try.
 
 This is a Text classification problem.
 
+# CI
+This repo has a [Github action](.github/workflows/ci.yml) that executes the tests in the [tests](./tests) folder on each commit in a PR o merging process, they run with [nox](https://nox.thea.codes/en/stable/). Nox creates a virtual environment, install the package and run all the tests.
 
 ## Testing
-For testing i use pytests, pytests sit on top of unitests and add some capabilities like fixtures and easier test creation process.
+For testing purposes, pytest is used. Pytest sits on top of unittest and adds some capabilities like fixtures and an easier test creation process.
 
-This repo has a [Github action](.github/workflows/ci.yml) that execute the tests in the [tests](./tests) folder on each commit in a PR o merging process, they run with [nox](https://nox.thea.codes/en/stable/), nox create a virtual environment install the package and run all the tests.
-
-
-## Development
-For this module I use this tools to lint code with coding good practice.
+## Linting
+For this module it was used tools to lint code with coding good practice.
 - black : code formatter.
 - isort : sort imports.
 - pylint : static code analysis tool.
 - pre-commit : to run all the linting process before commit.
 
-## CI
-Corre testing y linting.
-As the tests linting runs on [Github Actions](.github/workflows/ci.yml).
-
 ### GitFlow
-For each new feature i create a new branch in the project, create a pull request and when i think i finish i merge the PR. This help me to work in different parts of the project at the same time.
+For each new feature,  a new branch in the project, and a pull request were created. When the PR was finished it was merged.
+This helped to work in different parts of the project at the same time.
 
 ## Production
-For production i would suggest to use a data pipeline tools such as Airflow, Prefect, Dagster or any other. This tools help you maintain the data pipeline, knowing when a process fails, add retrying tools, you also can use them sensor, resource allocation, and many more.
+For production, It is suggested using data pipeline tools such as Airflow, Prefect, Dagster or any other. These tools help to maintain the data pipeline, knowing when a process fails, adding retrying tools, using sensor, resource allocation, and many more.
 
 ### Pin versions
-When going to production it is desirable to pin the exacts version of your package dependencies because you don't want any update of a dependencies break your package.
+When going to production, it is desirable to pin the exact version of your package dependencies because you do not want any update of a dependency that can break your package.
 
 ### Poetry to production
-The best way to go in production in my opinion y on a isolated environment, managed with docker or any other virtual environment tool.
+The best way to go in production is on an isolated environment, managed with docker or any other virtual environment tool.
 
 #### To Docker
 
-I add a [Dockerfile](Dockerfile) in this repo as an example on how i would run this on production.
+It is provided a [Dockerfile](Dockerfile) in this repository as an example on how it would run this on production.
 
 #### To pip
-Also if the requirements are others you can export this package to install it with pip.
+Also if the requirements are others,  this package can be export to install it with pip.
 
-with this command you create a `requirements.txt`:
+this command creates a `requirements.txt`:
 ```
 $ poetry export -f requirements.txt --output requirements.txt
 ```
-after that you can run :
-
+after that install it with:
 ```
 $ pip install -r requirements.txt
 ```
 
 ### Next Steps
-
-Note: This package is in WIP there are some things in the code to improve, you will find the TODOs in the code.
 
 - Extend for more datasets.
 - Extend to others NLP problems, like Question Answering.

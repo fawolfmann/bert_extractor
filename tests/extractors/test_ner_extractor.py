@@ -7,7 +7,7 @@ from unittest.mock import mock_open, patch
 
 from pandas.testing import assert_frame_equal
 
-from bert_extractor.extractors import NERExtractor
+from bert_extractor.extractors.ner import NERExtractor
 from tests.extractors.sample_data import (
     extractor_configs,
     ner_extractor_configs,

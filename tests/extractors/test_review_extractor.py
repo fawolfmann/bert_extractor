@@ -2,7 +2,7 @@
 
 from unittest.mock import patch
 
-from bert_extractor.extractors import ReviewsExtractor
+from bert_extractor.extractors.reviews import ReviewsExtractor
 from tests.extractors.sample_data import (
     extractor_configs,
     sample_extracted,

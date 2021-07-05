@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from kaggle.api.kaggle_api_extended import KaggleApi
 import numpy as np
+from transformers.tokenization_utils_base import BatchEncoding
 
 from bert_extractor.constants import NER_LABLES_MAP, SPECIAL_TOKEN_LABEL
 from bert_extractor.extractors.base import BaseBERTExtractor
@@ -97,7 +98,6 @@ class NERExtractor(BaseBERTExtractor):
         self.api.dataset_download_files(
             url, path=download_file, unzip=True,
         )
-        # TODO make this optional or read from configs.
         dataset_types = ["train", "valid", "test"]
         words_all = []
         labels_all = []
@@ -184,7 +184,7 @@ class NERExtractor(BaseBERTExtractor):
         sentence = []
         label_list = []
         labels = []
-        # TODO map this
+
         for word, label in zip(words_raw, labels_raw):
             if word:
                 if word != "-DOCSTART-":
@@ -202,7 +202,9 @@ class NERExtractor(BaseBERTExtractor):
 
         return sentences, labels
 
-    def process_labels(self, labels: List[List], words_ids: List[List]) -> np.array:
+    def process_labels(
+        self, labels: List[List], tokenized_sentences: BatchEncoding
+    ) -> np.array:
         """Align and pad labels.
         Pad all labels to the same length that tokens, adding -100 for no tokens.
         Add -100 for `[CLS]` and `[SEP]` tokens.
@@ -214,8 +216,8 @@ class NERExtractor(BaseBERTExtractor):
         ----------
         labels : List[List]
             preprocessed labels.
-        words_ids: List[List]
-            words id number to use for process.
+        tokenized_sentences: BatchEncoding
+            Tokenized sentences to use words_ids.
 
         Returns
         -------
@@ -223,10 +225,11 @@ class NERExtractor(BaseBERTExtractor):
             labels to train a model.
         """
         new_labels = []
-        # TODO map this
-        for label, word_idx in zip(labels, words_ids):
+
+        for index, label in enumerate(labels):
             previous_idx = None
             new_label = []
+            word_idx = tokenized_sentences.word_ids(batch_index=index)
             for idx in word_idx:
                 if idx is None:
                     new_label.append(SPECIAL_TOKEN_LABEL)
