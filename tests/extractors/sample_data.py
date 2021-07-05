@@ -1,6 +1,5 @@
 """Bert Data Extractor"""
 
-import pandas as pd
 import pytest
 
 
