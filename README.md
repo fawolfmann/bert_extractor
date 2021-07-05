@@ -3,6 +3,8 @@ Python module to extract and preprocess data for BERT classification.
 
 In this package, there are two types of extractors, one for Text Classification and another one for Token Classification, each of them extracts an associated dataset. It can also be extended to use with other NLP problems.
 
+The difference between one outcoming tensor and the other one are the labels, in Text Classification (Amazon Reviews) there is one label for the tokenized sentences, and in the Token Classification (CoNLL 2003) there is a label for each token.
+
 BERT requires specific format as input. A BERT model needs tokenized words, the tokenization depends on which BERT model is selected.
 All BERTs models are defined [here](https://huggingface.co/transformers/pretrained_models.html). All of these BERTs models can be used in the package setting in the configuration file.
 
@@ -136,7 +138,7 @@ Also if the requirements are others,  this package can be export to install it w
 
 this command creates a `requirements.txt`:
 ```
-$ poetry export -f requirements.txt --output requirements.txt
+$ poetry export --without-hashes -f requirements.txt --output requirements.txt
 ```
 after that install it with:
 ```
