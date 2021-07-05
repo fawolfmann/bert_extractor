@@ -1,4 +1,4 @@
-FROM python:3.9.5-slim-buster
+FROM python:3.8.5-slim-buster
 
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONUNBUFFERED=1 \
@@ -18,6 +18,3 @@ COPY ../poetry.lock ../pyproject.toml /code/
 # Project initialization:
 RUN poetry config virtualenvs.create false \
     && poetry install --no-dev --no-interaction --no-ansi
-
-# Creating folders, and files for a project:
-COPY ../ /code

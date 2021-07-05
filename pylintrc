@@ -31,4 +31,5 @@ disable =
     no-value-for-parameter,
     protected-access,
     logging-format-interpolation,
-    logging-fstring-interpolation
+    logging-fstring-interpolation,
+    redefined-outer-name

@@ -43,10 +43,10 @@ def _validate_config(config: Dict):
     ----------
     config : Dict
         Read configurations.
-    
+
     Raises
     ------
-        ValueError if any validation does not fullfil. 
+        ValueError if any validation does not fullfil.
     """
     if config.get("extractor_type") not in KNOWN_CONFIGS_TYPES:
         error_message = f"Unknown extractor type, knows {KNOWN_CONFIGS_TYPES}"

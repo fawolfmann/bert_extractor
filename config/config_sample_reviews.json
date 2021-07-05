@@ -4,7 +4,7 @@
         "pretrained_model_name_or_path": "bert-base-uncased",
         "sentence_col": "text",
         "labels_col": "label",
-        "cache_filepath": "./data/",
+        "cache_filepath": "./data/reviews",
         "read_cache": true
     },
     "extractor_url": "magazine"

@@ -2,7 +2,7 @@
 
 name: CI
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
@@ -30,7 +30,7 @@ jobs:
             python-version: 3.8 #install the python needed
         - name: Setup Nox
           # pin nox version
-          uses: excitedleigh/setup-nox@38c698655f40d5fe659b8589764ed04ee36d0414 
+          uses: excitedleigh/setup-nox@38c698655f40d5fe659b8589764ed04ee36d0414
         - name: execute lint with nox
           run: nox --sessions lint
         - name: execute tests with nox
