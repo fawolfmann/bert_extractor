@@ -7,6 +7,7 @@ from typing import List, Tuple
 import numpy as np
 from transformers.tokenization_utils_base import BatchEncoding
 
+from bert_extractor.constants import COVID_TWEETS_LABLES_MAP
 from bert_extractor.extractors.base import BaseBERTExtractor
 from bert_extractor.utils import cache_extract_raw
 
@@ -30,9 +31,8 @@ class CSVExtractor(BaseBERTExtractor):
         List
             list with all the data extracted.
         """
-        with open(local_path, mode="r") as csv_file:
-            csv_reader = csv.DictReader(csv_file)
-            loaded_dict = list(map(dict, csv_reader))
+        with open(local_path, mode="r", errors="ignore") as csv_file:
+            loaded_dict = list(csv.DictReader(csv_file, dialect="unix"))
 
         logger.info("Extraction successfull")
         return loaded_dict
@@ -54,8 +54,8 @@ class CSVExtractor(BaseBERTExtractor):
         sentences = []
         labels = []
         for raw in extracted_data:
-            sentences.append(raw.get("text", ""))
-            labels.append(raw["label"])
+            sentences.append(raw.get("OriginalTweet", ""))
+            labels.append(COVID_TWEETS_LABLES_MAP.get(raw["Sentiment"]))
 
         logger.info("Preproccessed dataframe")
 

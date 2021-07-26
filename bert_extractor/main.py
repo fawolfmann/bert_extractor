@@ -4,7 +4,10 @@ import click
 
 from bert_extractor.configs import read_config
 from bert_extractor.constants import NER_KAGGLE_DATASET, REVIEWS_DATASET
-from bert_extractor.extractors import BaseBERTExtractor, NERExtractor, ReviewsExtractor
+from bert_extractor.extractors.base import BaseBERTExtractor
+from bert_extractor.extractors.csv import CSVExtractor
+from bert_extractor.extractors.ner import NERExtractor
+from bert_extractor.extractors.reviews import ReviewsExtractor
 from bert_extractor.utils import store_tensor
 
 
@@ -40,9 +43,13 @@ def main(config_path: str, output_path: str):
         extractor = NERExtractor(**configs["extractor_config"])
         url = NER_KAGGLE_DATASET.get(configs["extractor_url"])
 
+    elif configs["extractor_type"] == "csv":
+        extractor = CSVExtractor(**configs["extractor_config"])
+        url = configs.get("extractor_url", "")
+
     tensor = extractor.extract_preprocess(url)
 
-    store_name = configs["extractor_type"] + "_" + url
+    store_name = configs["extractor_type"] + "_" + url.replace("/", "_")
     store_tensor(tensor, output_path, store_name)
 
 

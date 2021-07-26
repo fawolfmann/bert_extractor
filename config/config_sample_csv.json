@@ -1,0 +1,13 @@
+{
+    "extractor_type": "csv",
+    "extractor_config": {
+        "pretrained_model_name_or_path": "distilbert-base-uncased",
+        "sentence_col": "text",
+        "labels_col": "label",
+        "auth_username": "",
+        "auth_key": "",
+        "cache_path": "./data/csv/",
+        "read_cache": false
+    },
+    "extractor_url": "../../bert_extras/covid_tweets/Corona_NLP_train.csv"
+}

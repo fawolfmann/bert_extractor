@@ -23,11 +23,21 @@ REVIEWS_DATASET = {
     "appliances": "http://deepyeti.ucsd.edu/jianmo/amazon/categoryFilesSmall/Appliances_5.json.gz",
 }
 
+# COVID sentiment analysis
+COVID_TWEETS_LABLES_MAP = {
+    "Neutral": 0,
+    "Positive": 1,
+    "Extremely Negative": 2,
+    "Negative": 3,
+    "Extremely Positive": 4,
+}
+
 # Configs
 
 NER_CONFIG_TYPE = "ner"
 REVIEWS_CONFIG_TYPE = "reviews"
-KNOWN_CONFIGS_TYPES = [NER_CONFIG_TYPE, REVIEWS_CONFIG_TYPE]
+CSV_CONFIG_TYPE = "csv"
+KNOWN_CONFIGS_TYPES = [NER_CONFIG_TYPE, REVIEWS_CONFIG_TYPE, CSV_CONFIG_TYPE]
 
 KNOWN_NER_URLS = list(NER_KAGGLE_DATASET.keys())
 KNOWN_REVIEWS_URLS = list(REVIEWS_DATASET.keys())
